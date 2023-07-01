@@ -8,29 +8,31 @@ import { Util } from './util';
 })
 export class TreeTableComponent {
 
+  input: string = ''
   data: TreeData[] = structuredClone(Util.Data);
   tableDataDeepCopy: Array<TreeData> = [];
   allExpandedNodeList: Array<TreeData> = []
   currentExpandedRow = Object.assign({});
   ascendingOrder: boolean = false;
-  breadCrumbs: Array<any | null> = []
+  breadCrumbs: Array<number | null> = []
   config = {
     collapseAllOnExpand: true,    // callapse all other expanded rows when expnading a new row
-    collapseChildNodeOnExpand: false,
     paddinggLeft: 20
   }
+  keysAndTypes: any
 
   constructor() { }
 
   ngOnInit(): void {
     this.data = this.data.map((m: TreeData) => { return { ...m, expanded: false, level: 1, class: m.data.uuid } })
     this.tableDataDeepCopy = structuredClone(this.data)
+    this.getObjectKeysAndTypes()
   }
 
-  search(input: string) {
+  search() {
     const temp = structuredClone(this.tableDataDeepCopy.map((m) => { return { ...m, expanded: false } }))
-    if (input.length) {
-      this.data = temp.filter(m => m.data.title.toLowerCase().includes(input.toLowerCase()))
+    if (this.input.length) {
+      this.data = temp.filter(m => m.data.title.toLowerCase().includes(this.input.toLowerCase()))
     } else {
       this.data = temp
     }
@@ -167,10 +169,26 @@ export class TreeTableComponent {
   //   return list.length
   // }
 
-  sort(): void {
-    const temp = structuredClone(this.tableDataDeepCopy)
-    this.ascendingOrder = !this.ascendingOrder
-    this.data = this.ascendingOrder ? temp.sort((a, b) => a.data.title.localeCompare(b.data.title)) : temp.sort((a, b) => b.data.title.localeCompare(a.data.title))
+
+  getObjectKeysAndTypes() {
+    const array = Object.entries(this.data[0].data)
+    this.keysAndTypes = array.map((m) => { return [m[0], typeof m[1]] })
+    this.keysAndTypes = Object.fromEntries(this.keysAndTypes)
+  }
+
+  sort(key: any): void {
+    if (this.data.length) {
+      const temp = structuredClone(this.tableDataDeepCopy)
+      this.ascendingOrder = !this.ascendingOrder
+      switch (this.keysAndTypes[key]) {
+        case 'string':
+          this.data = this.ascendingOrder ? temp.sort((a: any, b: any) => a.data[key].localeCompare(b.data[key])) : temp.sort((a: any, b: any) => b.data.title.localeCompare(a.data[key]))
+          return;
+        case 'number':
+          this.data = this.ascendingOrder ? temp.sort((a: any, b: any) => a.data[key] > b.data[key] ? -1 : 1) : temp.sort((a: any, b: any) => a.data[key] < b.data[key] ? -1 : 1);
+          return;
+      }
+    }
   }
 }
 

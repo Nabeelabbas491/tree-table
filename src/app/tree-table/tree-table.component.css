@@ -41,7 +41,7 @@
  }
 
 .table-container{
-
+  user-select: none;
   overflow: auto;
   transform: rotateX(180deg);
 

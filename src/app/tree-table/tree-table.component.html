@@ -1,10 +1,8 @@
 <div class="d-flex justify-content-center align-items-center py-2">
   <input type="checkbox" [(ngModel)]="config.collapseAllOnExpand" class="mx-2" (change)="collapseAll()">
-  <span class="mr-1">Collapse All On Expand </span>
-  <input type="checkbox" [(ngModel)]="config.collapseChildNodeOnExpand" class="mx-2">
-  <span class="mr-1"> Collapse other child Nodes On Expand </span>
+  <span class="mr-1">Collapse all previous nodes on expanding a new top parent row </span>
 </div>
-<div class="p-2">
+<div class="p-3">
   <div class="header row mb-2">
     <div class="col-md-8 d-flex align-items-center">
       <div class="px-2">
@@ -22,7 +20,7 @@
     </div>
     <div class="col-md-4 d-flex align-items-center justify-content-end">
       <fieldset class="form-group m-0">
-        <input class="form-control" placeholder="Search">
+        <input class="form-control" placeholder="Search" (keyup)="search()" [(ngModel)]="input">
       </fieldset>
     </div>
   </div>
@@ -31,17 +29,53 @@
       <thead>
         <tr class="header-row">
           <th>
-            <span (click)="sort()" class="cursor-pointer">
+            <span (click)="sort('title')" class="cursor-pointer">
               Funds
+              <img src="assets/sort.svg">
             </span>
           </th>
-          <th>Market Value ($)</th>
-          <th>Physical Impact (%)</th>
-          <th>Resilience Adjusted Impact (%)</th>
-          <th>Value At Risk ($)</th>
-          <th>Physical Risk Score</th>
-          <th>Readiness Score</th>
-          <th>Overall Resilience Score</th>
+          <th>
+            <span (click)="sort('avg_market_value')" class="cursor-pointer">
+              Market Value ($)
+              <img src="assets/sort.svg">
+            </span>
+          </th>
+          <th>
+            <span (click)="sort('avg_physical_impact')" class="cursor-pointer">
+              Physical Impact (%)
+              <img src="assets/sort.svg">
+            </span>
+          </th>
+          <th>
+            <span (click)="sort('avg_res_adj_impact')" class="cursor-pointer">
+              Resilience Adjusted Impact (%)
+              <img src="assets/sort.svg">
+            </span>
+          </th>
+          <th>
+            <span (click)="sort('avg_value_at_risk')" class="cursor-pointer">
+              Value At Risk ($)
+              <img src="assets/sort.svg">
+            </span>
+          </th>
+          <th>
+            <span (click)="sort('avg_risk_score')" class="cursor-pointer">
+              Physical Risk Score
+              <img src="assets/sort.svg">
+            </span>
+          </th>
+          <th>
+            <span (click)="sort('avg_readiness_score')" class="cursor-pointer">
+              Readiness Score
+              <img src="assets/sort.svg">
+            </span>
+          </th>
+          <th>
+            <span (click)="sort('avg_vulnerability_score')" class="cursor-pointer">
+              Overall Resilience Score
+              <img src="assets/sort.svg">
+            </span>
+          </th>
         </tr>
       </thead>
       <tbody>
