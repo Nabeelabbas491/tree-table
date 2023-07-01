@@ -13,17 +13,17 @@ export class TreeTableComponent {
   allExpandedNodeList: Array<TreeData> = []
   currentExpandedRow = Object.assign({});
   ascendingOrder: boolean = false;
-  breadCrumbs:Array<any | null> = []
+  breadCrumbs: Array<any | null> = []
   config = {
-    collapseAllOnExpand : true,    // callapse all other expanded rows when expnading a new row
-    collapseChildNodeOnExpand : false ,
-    paddinggLeft : 20
+    collapseAllOnExpand: true,    // callapse all other expanded rows when expnading a new row
+    collapseChildNodeOnExpand: false,
+    paddinggLeft: 20
   }
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
-    this.data = this.data.map((m:TreeData) => { return { ...m, expanded: false, level: 1, class: m.data.uuid } })
+    this.data = this.data.map((m: TreeData) => { return { ...m, expanded: false, level: 1, class: m.data.uuid } })
     this.tableDataDeepCopy = structuredClone(this.data)
   }
 
@@ -36,7 +36,7 @@ export class TreeTableComponent {
     }
   }
 
-  recursive(item: TreeData, idx : number) {
+  recursive(item: TreeData, idx: number) {
     item.expanded = true
     this.allExpandedNodeList.push(item)
     if (item.children && item.children.length) {
@@ -56,21 +56,32 @@ export class TreeTableComponent {
       this.recursive(item, idx)
     })
     this.data = structuredClone(this.allExpandedNodeList)
-    // this.getTotalCount()
+    this.getBreadCrumbs()
   }
 
-  
+  getBreadCrumbs() {
+    this.breadCrumbs = []
+    const levels = new Set([...Array.from(this.data, ({ level }) => level)])
+    levels.forEach((level, index) => {
+      if (index > 0) {
+        const elements: Array<TreeData> = this.data.filter(m => m.level == level)
+        this.breadCrumbs.push(elements.length)
+      }
+    })
+    this.config.collapseAllOnExpand && this.breadCrumbs.splice(0, 1)
+  }
+
   collapseAll(): void {
     this.data = structuredClone(this.tableDataDeepCopy.map((m) => { return { ...m, expanded: false } }))
-    this.breadCrumbs = []
+    this.getBreadCrumbs()
   }
 
-  expandRow(item:TreeData, idx : number): void {
+  expandRow(item: TreeData, idx: number): void {
 
     // for callapsing the pervious expanded row
     if (Object.keys(this.currentExpandedRow).length && item.level == 1 && this.config.collapseAllOnExpand) {
       this.collapseRow(this.currentExpandedRow.data, this.currentExpandedRow.index)
-      idx = this.data.findIndex((m:TreeData) => m.data.uuid == item.data.uuid)
+      idx = this.data.findIndex((m: TreeData) => m.data.uuid == item.data.uuid)
       item = this.data[idx]
     }
 
@@ -84,28 +95,63 @@ export class TreeTableComponent {
       this.data.splice(idx + 1 + i, 0, m)
     })
 
-   if(this.config.collapseAllOnExpand){
-    if (item.level == 1) {
+    if (item.level == 1 && this.config.collapseAllOnExpand) {
       this.currentExpandedRow.index = idx
       this.currentExpandedRow.data = item
     }
 
-   
-
-    if (item.level == 1) {
-      let firstObj = { count: this.getCount(item), level:item.level}
-      this.breadCrumbs = [null, firstObj]
-    } else {
-      this.breadCrumbs[item.level] = { count: this.getCount(item), level:item.level }
-    }
-   }
+    // if (this.config.collapseAllOnExpand) {
+    //   if (item.level == 1) {
+    //     this.breadCrumbs = [null, item.children?.length]
+    //   } else {
+    //     this.breadCrumbs[item.level] = this.getCount(item.level)
+    //   }
+    // } else {
+    this.getBreadCrumbs()
+    // }
   }
 
-  getCount(item:TreeData){
-    let array = this.data.filter((m: TreeData) => (m.topParentId == item.topParentId && m.level == item.level))
+  getCount(level: number) {
+    let array = this.data.filter((m: TreeData) => (m.topParentId == this.currentExpandedRow.data.data.uuid && m.level == level))
     let count = 0
     array.forEach((m: any) => { if (m.expanded) count = count + m.children.length })
     return count
+  }
+
+  collapseRow(item: TreeData, idx: number): void {
+
+    item.expanded = false
+    const uuid = item.data.uuid
+    let indexesToBeRemoved: any = []
+
+    for (let i = 0; i < this.data.length; i++) {
+      if (i == idx) {
+        continue;
+      } else if (this.data[i]['class'].includes(uuid)) {
+        indexesToBeRemoved.push(i)
+      }
+    }
+
+    this.data = this.data.filter((m, i) => !indexesToBeRemoved.includes(i))
+
+    // if (this.config.collapseAllOnExpand) {
+    //   if (item.level == 1) {
+    //     this.breadCrumbs = []
+    //   } else {
+
+    //     for (let i = item.level; i < this.breadCrumbs.length; i++) {
+    //       this.breadCrumbs[i] = this.getCount(i)
+    //     }
+
+    //     let indexOfZero = this.breadCrumbs.findIndex((m) => m == 0)
+    //     if (indexOfZero > -1) {
+    //       this.breadCrumbs.splice(indexOfZero, this.breadCrumbs.length - item.level)
+    //     }
+
+    //   }
+    // } else {
+    this.getBreadCrumbs()
+    // }
   }
 
   // getCount(item, idx) {
@@ -121,48 +167,21 @@ export class TreeTableComponent {
   //   return list.length
   // }
 
-  collapseRow(item:TreeData, idx : number): void {
-    item.expanded = false
-    const uuid = item.data.uuid
-    let indexesToBeRemoved : any = []
-
-    for (let i = 0; i < this.data.length; i++) {
-      if (i == idx) {
-        continue;
-      } else if (this.data[i]['class'].includes(uuid)) {
-        indexesToBeRemoved.push(i)
-      }
-    }
-
-    this.data = this.data.filter((m, i) => !indexesToBeRemoved.includes(i))
-
-   if(this.config.collapseAllOnExpand){
-
-    if (item.level == 1) {
-      this.breadCrumbs = []
-    } else {
-      this.getCount(item) == 0 ? this.breadCrumbs.splice(item.level, this.breadCrumbs.length - item.level) 
-      : this.breadCrumbs[item.level] = { count: this.getCount(item), level: item.level }
-    }
-   }
-  }
-
   sort(): void {
     const temp = structuredClone(this.tableDataDeepCopy)
     this.ascendingOrder = !this.ascendingOrder
     this.data = this.ascendingOrder ? temp.sort((a, b) => a.data.title.localeCompare(b.data.title)) : temp.sort((a, b) => b.data.title.localeCompare(a.data.title))
   }
-
 }
 
 export interface TreeData {
   data: TableRow
-  expanded:boolean
-  level : number 
+  expanded: boolean
+  level: number
   topParentId: string | unknown
-  paddingLeft : string
+  paddingLeft: string
   class: string
-  children: Array<TreeData> | null 
+  children: Array<TreeData> | null
 }
 
 export interface TableRow {
@@ -182,6 +201,6 @@ export interface TableRow {
   avg_vulnerability_score: number,
   avg_value_at_risk: number,
   avg_market_value: number,
-  tier_4 : string,
-  scenario : string
+  tier_4: string,
+  scenario: string
 }
