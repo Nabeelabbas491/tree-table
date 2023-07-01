@@ -1,0 +1,101 @@
+.labels{
+    color :  #009999;
+    font-weight : 600;
+    font-size : 14px
+} 
+
+.slash{
+    color :  rgba(181, 181, 181, 1);
+    font-weight : 600;
+    font-size : 14px
+}
+
+.form-group{
+    width: 100%;
+}
+
+.collapse-all-text{
+    color :  #292929;
+    font-weight : 500;
+    font-size : 12px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.table-container::-webkit-scrollbar {
+  height: 5px !important;
+  width: 5px !important;
+}
+
+.table-container-portfolios::-webkit-scrollbar {
+  height: 5px !important;
+  width: 5px !important;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #adb5bd;
+ }
+
+.table-container-portfolios::-webkit-scrollbar-thumb {
+  background: #adb5bd;
+ }
+
+.table-container{
+
+  overflow: auto;
+  transform: rotateX(180deg);
+
+}
+
+.table{
+    transform: rotateX(180deg);
+    margin: unset;
+    margin-bottom: 5px;
+}
+
+td{
+    border: 1px solid #dee2e6 !important;
+    padding: 6px 12px !important;
+}
+
+th{
+    border: 1px solid #dee2e6 !important;
+}
+  
+.header-row{
+    background-color: #4A7182;
+    color :  #FFFFFF;
+    font-weight : 600;
+    font-size : 12px
+}
+
+.property-name{
+    color: #006666;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+.hide-row{
+    background-color: #F1F1F3 !important;
+}
+
+.expnaded-row{
+    background: rgba(241, 241, 243, 0.5);
+    color: #009999 !important;
+}
+  
+td{
+    padding: 8px !important;
+}
+  
+th{
+    padding: 8px !important;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+
+
