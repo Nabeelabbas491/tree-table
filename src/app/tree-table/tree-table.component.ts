@@ -17,6 +17,7 @@ export class TreeTableComponent {
   breadCrumbs: Array<number | null> = []
   config = {
     collapseAllOnExpand: true,    // callapse all other expanded rows when expnading a new row
+    collapseOtherChildOnExpand: false,    // callapse all other child rows when expnading a new child row 
     paddinggLeft: 20
   }
   keysAndTypes: any
@@ -102,15 +103,15 @@ export class TreeTableComponent {
       this.currentExpandedRow.data = item
     }
 
-    // if (this.config.collapseAllOnExpand) {
-    //   if (item.level == 1) {
-    //     this.breadCrumbs = [null, item.children?.length]
-    //   } else {
-    //     this.breadCrumbs[item.level] = this.getCount(item.level)
-    //   }
-    // } else {
+    if (item.level > 1 && this.config.collapseOtherChildOnExpand) {
+      let data = this.data.find((m) => m.level == item.level && m.expanded && m.data.uuid != item.data.uuid)
+      let index = this.data.findIndex(m => m.data.uuid == data?.data.uuid)
+      data && this.collapseRow(data, index)
+      data ? data.expanded = false : ''
+    }
+
     this.getBreadCrumbs()
-    // }
+
   }
 
   getCount(level: number) {
@@ -136,39 +137,9 @@ export class TreeTableComponent {
 
     this.data = this.data.filter((m, i) => !indexesToBeRemoved.includes(i))
 
-    // if (this.config.collapseAllOnExpand) {
-    //   if (item.level == 1) {
-    //     this.breadCrumbs = []
-    //   } else {
-
-    //     for (let i = item.level; i < this.breadCrumbs.length; i++) {
-    //       this.breadCrumbs[i] = this.getCount(i)
-    //     }
-
-    //     let indexOfZero = this.breadCrumbs.findIndex((m) => m == 0)
-    //     if (indexOfZero > -1) {
-    //       this.breadCrumbs.splice(indexOfZero, this.breadCrumbs.length - item.level)
-    //     }
-
-    //   }
-    // } else {
     this.getBreadCrumbs()
-    // }
+
   }
-
-  // getCount(item, idx) {
-  //   let list = []
-  //   for (let i = 0; i < this.data.length; i++) {
-  //     if (i == idx) {
-  //       continue;
-  //     } else if (this.data[i]['class'].includes(item.class)) {
-  //       // console.log("class", this.data[i]['class'])
-  //       list.push(i)
-  //     }
-  //   }
-  //   return list.length
-  // }
-
 
   getObjectKeysAndTypes() {
     const array = Object.entries(this.data[0].data)
@@ -190,6 +161,7 @@ export class TreeTableComponent {
       }
     }
   }
+
 }
 
 export interface TreeData {

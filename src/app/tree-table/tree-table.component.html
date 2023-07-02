@@ -2,6 +2,11 @@
   <input type="checkbox" [(ngModel)]="config.collapseAllOnExpand" class="mx-2" (change)="collapseAll()">
   <span class="mr-1">Collapse all previous nodes on expanding a new top parent row </span>
 </div>
+<div class="d-flex justify-content-center align-items-center py-2">
+  <input type="checkbox" [(ngModel)]="config.collapseOtherChildOnExpand" class="mx-2"
+    (change)="config.collapseAllOnExpand = true; collapseAll()">
+  <span class="mr-1">Collapse other child rows on expanding a new child row </span>
+</div>
 <div class="p-3">
   <div class="header row mb-2">
     <div class="col-md-8 d-flex align-items-center">
